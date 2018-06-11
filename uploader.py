@@ -41,28 +41,28 @@ def upload():
 def upload_file():
    if request.method == 'POST':
       f = request.files['file']
+      ver = request.form["client_ver"]
+      clienttype = request.form['client_type']
+	
+      print("ver=>", ver )
+      print("clienttype=>", clienttype)
+
+      if ver != "1.0" or clienttype != "android":
+          print('[upload] secret info not matched!')
+          return Response('Error uploading', status=500)
 
       if f.filename == '':
-          log.error('[upload] Upload attempt with no filename')
+          print('[upload] Upload attempt with no filename')
           return Response('No filename uploaded', status=500)
-
 
       if f: 
           fext, status = allowed_file(f.filename)
           if status:
               filename = secure_filename(f.filename)
               f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-              #filename = secure_filename(f.filename)
               
               tmppath = md5(os.path.join(app.config['UPLOAD_FOLDER'], filename)) + "." + fext
-              #newfilename = md5(f) + "." + fext
-              #print("filename =>", newfilename)
-              #Date = datetime.today().strftime('%Y-%m-%d')
-              
-              #print("app.config UPLOAD_FOLDER=>", app.config['UPLOAD_FOLDER'])
-              #oldfilepath=os.path.join(app.config['UPLOAD_FOLDER'], filename)
-              #f.save(oldfilepath)
-              #newfilepath=os.path.join(app.config['UPLOAD_FOLDER'], tmppath)
+
               os.rename(os.path.join(app.config['UPLOAD_FOLDER'], filename), os.path.join(app.config['UPLOAD_FOLDER'], tmppath))
               return Response('Uploaded file successfully', status=200)
    return
@@ -73,5 +73,4 @@ def uploaded_file(filename):
                                filename)
 		
 if __name__ == '__main__':
-   #app.run(debug = True)
-   app.run(host='0.0.0.0', port=int('80'), debug=True)
+   app.run(host='0.0.0.0', port=int('5000'), debug=True)
